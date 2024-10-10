@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.mc_account.DTO.AccountDataDTO;
 import ru.skillbox.mc_account.DTO.AccountMeDTO;
@@ -45,6 +47,7 @@ public class AccountController {
                     @Parameter(name = "email", description = "Email адрес", required = true, in = ParameterIn.QUERY)
             }
     )
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
     @GetMapping
     public ResponseEntity<AccountResponseDTO> getAccount(
             @RequestParam String email) {
@@ -56,6 +59,7 @@ public class AccountController {
 
 
     @Operation(summary = "Обновление аккаунта")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping
     public ResponseEntity<AccountMeDTO> updateAccount(
             @Valid @RequestBody AccountMeDTO accountMeDTO) {
@@ -63,43 +67,58 @@ public class AccountController {
         return ResponseEntity.ok(updatedAccount);
     }
 
-
+    // GET /api/v1/account/me
     @Operation(summary = "Получение информации о текущем аккаунте")
     @GetMapping("/me")
-    public ResponseEntity<AccountMeDTO> getAccountMe() {
-        AccountMeDTO account = accountService.getAccountMe();
+    public ResponseEntity<AccountMeDTO> getCurrentAccount(Authentication authentication) {
+        String email = authentication.getName();
+        AccountMeDTO account = accountService.getAccountMe(email);
         return ResponseEntity.ok(account);
     }
 
+    //Этот запрос нужно уточнить!!!
+    // PUT /api/v1/account/me
+//    @Operation(summary = "Обновление информации о текущем аккаунте")
+//    @PutMapping("/me")
+//    public ResponseEntity<AccountMeDTO> updateAccountMe(
+//            @RequestBody AccountMeDTO accountMeDTO) {
+//        AccountMeDTO updatedAccount = accountService.updateAccountMe(accountMeDTO);
+//        return ResponseEntity.ok(updatedAccount);
+//    }
 
-
+    // Почему во входящих параметрах нет тела?
     @Operation(summary = "Обновление информации о текущем аккаунте")
     @PutMapping("/me")
     public ResponseEntity<AccountMeDTO> updateAccountMe(
-            @RequestBody AccountMeDTO accountMeDTO) {
-        AccountMeDTO updatedAccount = accountService.updateAccountMe(accountMeDTO);
+            Authentication authentication) {
+        AccountMeDTO updatedAccount = accountService.updateAccountMe(authentication.getName());
         return ResponseEntity.ok(updatedAccount);
     }
 
 
-    @Operation(summary = "Удаление текущего аккаунта")
+
+    @Operation(summary = "Пометить текущий аккаунт как удалённый")
     @DeleteMapping("/me")
-    public ResponseEntity<Void> deleteAccountMe() {
-        accountService.deleteAccountMe();
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> markAccountAsDeleted(Authentication authentication) {
+    String email = authentication.getName();
+    accountService.markAccountAsDeleted(email);
+    return ResponseEntity.ok().build();
     }
 
+
     @Operation(summary = "Получение аккаунта по ID")
+    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<AccountDataDTO> getAccountById(@PathVariable UUID id) {
         AccountDataDTO accountDTO = accountService.getAccountById(id);
         return ResponseEntity.ok(accountDTO);
     }
 
-    @Operation(summary = "Удаление аккаунта по ID")
+    @Operation(summary = "Пометить аккаунт как удалённый по ID")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable UUID id) {
-        accountService.deleteAccount(id);
+    public ResponseEntity<Void> markAccountAsDeletedById(@PathVariable UUID id) {
+        accountService.markAccountAsDeleted(id);
         return ResponseEntity.ok().build();
     }
 }

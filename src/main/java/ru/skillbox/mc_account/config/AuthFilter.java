@@ -3,14 +3,23 @@ package ru.skillbox.mc_account.config;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import ru.skillbox.mc_account.security.CustomUserDetailsService;
+import ru.skillbox.mc_account.exception.InvalidInputException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Component
 public class AuthFilter implements Filter {
@@ -24,9 +33,12 @@ public class AuthFilter implements Filter {
     // Флаг для временной заглушки
     private boolean bypassAuthCheck = true;
 
+    private final CustomUserDetailsService userDetailsService;
+
     @Autowired
-    public AuthFilter(RestTemplate restTemplate) {
+    public AuthFilter(RestTemplate restTemplate, CustomUserDetailsService userDetailsService) {
         this.restTemplate = restTemplate;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -52,10 +64,25 @@ public class AuthFilter implements Filter {
 
         logger.info("Processing request: {} with token: {}", requestURI, authToken);
 
+        String userEmail;
+        try {
+            userEmail = extractEmailFromCurrentToken();
+        } catch (InvalidInputException e) {
+            logger.warn("Invalid token: {}", e.getMessage());
+            ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            return;
+        }
+
         if (!isValidToken(authToken, (HttpServletResponse) response)) {
             logger.warn("Invalid or missing Authorization token for request: {}", requestURI);
             return;
         }
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
+
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         chain.doFilter(request, response);
     }
@@ -94,8 +121,38 @@ public class AuthFilter implements Filter {
         }
     }
 
+    private String extractEmailFromCurrentToken() {
+        String token = AuthFilter.getCurrentToken();
+        if (token == null || token.trim().isEmpty()) {
+            throw new InvalidInputException("Authorization token must not be empty");
+        }
+
+        String email;
+        try {
+            String[] tokenParts = token.split("\\.");
+            if (tokenParts.length != 3) {
+                throw new InvalidInputException("Invalid token format: Token must have 3 parts");
+            }
+            String payload = new String(Base64.getUrlDecoder().decode(tokenParts[1]), StandardCharsets.UTF_8);
+            JSONObject jsonObject = new JSONObject(payload);
+            if (!jsonObject.has("email")) {
+                throw new InvalidInputException("Email is missing from the token");
+            }
+
+            email = jsonObject.getString("email");
+        } catch (IllegalArgumentException e) {
+            throw new InvalidInputException("Invalid token format: Unable to decode payload");
+        } catch (JSONException e) {
+            throw new InvalidInputException("Invalid token format: Error parsing payload");
+        } catch (Exception e) {
+            throw new InvalidInputException("Invalid token format: " + e.getMessage());
+        }
+
+        return email;
+    }
+
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         this.restTemplate = new RestTemplate();
     }
 

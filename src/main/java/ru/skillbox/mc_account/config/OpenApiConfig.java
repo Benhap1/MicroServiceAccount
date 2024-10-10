@@ -1,9 +1,12 @@
 package ru.skillbox.mc_account.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -25,7 +28,11 @@ public class OpenApiConfig {
                                 .email("support@example.com"))
                         .license(new License()
                                 .name("Apache 2.0")
-                                .url("http://springdoc.org")));
+                                .url("http://springdoc.org")))
+                .components(new Components()
+                        .addSecuritySchemes("basicScheme",
+                                new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("basic")))
+                .addSecurityItem(new SecurityRequirement().addList("basicScheme"));
     }
 }
 
