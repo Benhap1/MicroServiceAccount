@@ -52,7 +52,7 @@ public class AccountController {
     public ResponseEntity<AccountResponseDTO> getAccount(
             @RequestParam String email) {
         logger.debug("Received request with email: {}", email);
-        AccountResponseDTO account = accountService.getAccount(email); // Изменен тип возвращаемого значения
+        AccountResponseDTO account = accountService.getAccount(email);
         logger.debug("Returning account: {}", account);
         return ResponseEntity.ok(account);
     }

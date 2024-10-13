@@ -5,7 +5,6 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.skillbox.mc_account.model.Role;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -45,11 +44,6 @@ public class AccountDetails implements UserDetails {
     @Override
     public boolean isAccountNonLocked() {
         return !blocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return !deleted;
     }
 
     @Override
