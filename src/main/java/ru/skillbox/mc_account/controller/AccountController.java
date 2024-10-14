@@ -76,17 +76,7 @@ public class AccountController {
         return ResponseEntity.ok(account);
     }
 
-    //Этот запрос нужно уточнить!!!
     // PUT /api/v1/account/me
-//    @Operation(summary = "Обновление информации о текущем аккаунте")
-//    @PutMapping("/me")
-//    public ResponseEntity<AccountMeDTO> updateAccountMe(
-//            @RequestBody AccountMeDTO accountMeDTO) {
-//        AccountMeDTO updatedAccount = accountService.updateAccountMe(accountMeDTO);
-//        return ResponseEntity.ok(updatedAccount);
-//    }
-
-    // Почему во входящих параметрах нет тела?
     @Operation(summary = "Обновление информации о текущем аккаунте")
     @PutMapping("/me")
     public ResponseEntity<AccountMeDTO> updateAccountMe(

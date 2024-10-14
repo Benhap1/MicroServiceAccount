@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.skillbox.mc_account.security.CustomUserDetailsService;
 import ru.skillbox.mc_account.security.JwtUtils;
-import java.io.IOException;
 
+import java.io.IOException;
 
 @Component
 public class AuthFilter implements Filter {
@@ -28,6 +28,8 @@ public class AuthFilter implements Filter {
     private final String AUTH_SERVICE_URL = "http://auth-service/api/v1/auth/validate";
     private final CustomUserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
+
+    private final boolean enableTokenCheck = false; // Установите true, если нужно включить проверку токена
 
     @Autowired
     public AuthFilter(RestTemplate restTemplate, CustomUserDetailsService userDetailsService, JwtUtils jwtUtils) {
@@ -49,8 +51,13 @@ public class AuthFilter implements Filter {
             return;
         }
 
+        if (!enableTokenCheck) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         if (authToken != null && authToken.startsWith("Bearer ")) {
-            authToken = authToken.substring(7);  // Убираем "Bearer " из токена
+            authToken = authToken.substring(7);
         }
 
         if (authToken != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -91,13 +98,14 @@ public class AuthFilter implements Filter {
             HttpHeaders headers = new HttpHeaders();
             headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
             HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<Void> authResponse = restTemplate.exchange(AUTH_SERVICE_URL, HttpMethod.GET, entity, Void.class);
 
-            if (authResponse.getStatusCode().is2xxSuccessful()) {
+            ResponseEntity<Boolean> authResponse = restTemplate.exchange(AUTH_SERVICE_URL, HttpMethod.GET, entity, Boolean.class);
+
+            if (authResponse.getStatusCode().is2xxSuccessful() && Boolean.TRUE.equals(authResponse.getBody())) {
                 logger.info("Token validation successful");
                 return true;
             } else {
-                logger.warn("Token validation failed with status: {}", authResponse.getStatusCode());
+                logger.warn("Token validation failed with status: {}, response body: {}", authResponse.getStatusCode(), authResponse.getBody());
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Authorization Token");
                 return false;
             }

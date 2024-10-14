@@ -4,15 +4,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
-import ru.skillbox.mc_account.DTO.AccountDataDTO;
-import ru.skillbox.mc_account.DTO.AccountMeDTO;
-import ru.skillbox.mc_account.DTO.AccountResponseDTO;
-import ru.skillbox.mc_account.DTO.AuthorityDTO;
+import ru.skillbox.mc_account.DTO.*;
 import ru.skillbox.mc_account.model.Account;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import ru.skillbox.mc_account.DTO.UserEvent;
 
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
@@ -60,6 +58,18 @@ public interface AccountMapper {
         accountDataDTO.setAuthorities(mapAuthorities(account));
         return accountDataDTO;
     }
+
+
+    @Mapping(target = "id", source = "account.id")
+    @Mapping(target = "firstName", source = "account.firstName")
+    @Mapping(target = "lastName", source = "account.lastName")
+    @Mapping(target = "email", source = "account.email")
+    @Mapping(target = "password", source = "account.password")
+    @Mapping(target = "messagePermission", source = "account.messagePermission")
+    @Mapping(target = "deleted", source = "account.deleted")
+    @Mapping(target = "blocked", source = "account.blocked")
+    UserEvent toUserEvent(Account account);
+
 
     @Named("instantToString")
     default String instantToString(Instant instant) {

@@ -25,6 +25,7 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
     private String phone;
     private String photo;
     private String profileCover;

@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.skillbox.mc_account.DTO.AccountDataDTO;
 import ru.skillbox.mc_account.DTO.AccountMeDTO;
 import ru.skillbox.mc_account.DTO.AccountResponseDTO;
+import ru.skillbox.mc_account.DTO.UserEvent;
 import ru.skillbox.mc_account.exception.InvalidInputException;
 import ru.skillbox.mc_account.exception.ResourceNotFoundException;
 import ru.skillbox.mc_account.mapper.AccountMapper;
@@ -25,13 +26,17 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
 
+    private final KafkaProducerService kafkaProducerService;
+
 
     // POST /api/v1/account
     @Validated
     public AccountMeDTO createAccount(@Valid AccountMeDTO accountMeDTO) {
         Account account = accountMapper.toEntity(accountMeDTO);
         account.setCreatedOn(Instant.now());
-        return accountMapper.toDTO(accountRepository.save(account));
+        Account savedAccount = accountRepository.save(account);
+        kafkaProducerService.sendUserEvent(accountMapper.toUserEvent(savedAccount));
+        return accountMapper.toDTO(savedAccount);
     }
 
 
@@ -82,6 +87,7 @@ public class AccountService {
         account.setBlocked(accountMeDTO.isBlocked());
 
         Account updatedAccount = accountRepository.save(account);
+        kafkaProducerService.sendUserEvent(accountMapper.toUserEvent(updatedAccount));
         return accountMapper.toDTO(updatedAccount);
     }
 
@@ -94,40 +100,12 @@ public class AccountService {
     }
 
 
-
-
-    // PUT /api/v1/account/me - уточнить реализацию нужно ли тело в параметрах запроса!
-//    public AccountMeDTO updateAccountMe(AccountMeDTO accountMeDTO) {
-//        String email = extractEmailFromCurrentToken();
-//        Account account = accountRepository.findByEmail(email)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-//
-//        account.setFirstName(accountMeDTO.getFirstName());
-//        account.setLastName(accountMeDTO.getLastName());
-//        account.setEmail(accountMeDTO.getEmail());
-//        account.setPassword(accountMeDTO.getPassword());
-//        account.setPhone(accountMeDTO.getPhone());
-//        account.setPhoto(accountMeDTO.getPhoto());
-//        account.setProfileCover(accountMeDTO.getProfileCover());
-//        account.setAbout(accountMeDTO.getAbout());
-//        account.setCity(accountMeDTO.getCity());
-//        account.setCountry(accountMeDTO.getCountry());
-//        account.setStatusCode(accountMeDTO.getStatusCode());
-//        account.setRegDate(accountMeDTO.getRegDate());
-//        account.setBirthDate(accountMeDTO.getBirthDate());
-//        account.setMessagePermission(accountMeDTO.getMessagePermission());
-//        account.setLastOnlineTime(accountMeDTO.getLastOnlineTime());
-//        account.setEmojiStatus(accountMeDTO.getEmojiStatus());
-//        account.setUpdatedOn(Instant.now());
-//
-//        accountRepository.save(account);
-//        return accountMapper.toDTO(account);
-//    }
-
     // PUT /api/v1/account/me
     public AccountMeDTO updateAccountMe(String email) {
         Account account = accountRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+        UserEvent userEvent = accountMapper.toUserEvent(account);
+        kafkaProducerService.sendUserEvent(userEvent);
         return accountMapper.toDTO(account);
     }
 
@@ -140,6 +118,7 @@ public class AccountService {
         account.setDeleted(true);
         account.setDeletionTimestamp(Instant.now());
         accountRepository.save(account);
+        kafkaProducerService.sendUserEvent(accountMapper.toUserEvent(account));
     }
 
 
@@ -161,5 +140,6 @@ public class AccountService {
         account.setDeleted(true);
         account.setDeletionTimestamp(Instant.now());
         accountRepository.save(account);
+        kafkaProducerService.sendUserEvent(accountMapper.toUserEvent(account));
     }
 }
