@@ -20,10 +20,12 @@ public class JwtUtils {
             String payload = new String(Base64.getDecoder().decode(tokenParts[1]));
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> claims = objectMapper.readValue(payload, Map.class);
-            return claims.get("email").toString();
+            return claims.get("sub").toString();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 }
+
+
