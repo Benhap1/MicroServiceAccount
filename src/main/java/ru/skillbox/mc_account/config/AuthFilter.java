@@ -42,6 +42,7 @@ public class AuthFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
         String authToken = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
         String requestURI = httpRequest.getRequestURI();
 
@@ -61,7 +62,7 @@ public class AuthFilter implements Filter {
         }
 
         if (authToken != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (isValidToken(authToken, (HttpServletResponse) response)) {
+            if (isValidToken(authToken, httpResponse)) {
                 try {
                     String userEmail = jwtUtils.getEmailFromToken(authToken);
                     UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
@@ -72,7 +73,7 @@ public class AuthFilter implements Filter {
                     logger.info("Authenticated user: {}", userEmail);
                 } catch (Exception e) {
                     logger.warn("Authentication failed: {}", e.getMessage());
-                    ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                    httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
                     return;
                 }
             }
@@ -87,7 +88,7 @@ public class AuthFilter implements Filter {
                 requestURI.startsWith("/swagger-ui");
     }
 
-    private boolean isValidToken(String token, HttpServletResponse response) throws IOException {
+    protected boolean isValidToken(String token, HttpServletResponse response) throws IOException {
         if (token == null || token.trim().isEmpty()) {
             logger.warn("Authorization token is missing");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization token is missing");
