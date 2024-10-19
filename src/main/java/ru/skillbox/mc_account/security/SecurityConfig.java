@@ -27,12 +27,17 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
+
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/account").permitAll()
+
+
                         .requestMatchers(HttpMethod.GET, "/api/v1/account").hasAnyAuthority("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/account").hasAnyAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/account").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/account/{id}").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/account/{id}").hasAuthority("ADMIN")
+
+
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
@@ -47,5 +52,3 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-
-

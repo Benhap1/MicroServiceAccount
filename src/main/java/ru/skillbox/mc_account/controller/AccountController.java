@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.skillbox.mc_account.DTO.AccountDataDTO;
@@ -47,7 +46,7 @@ public class AccountController {
                     @Parameter(name = "email", description = "Email адрес", required = true, in = ParameterIn.QUERY)
             }
     )
-    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
+
     @GetMapping
     public ResponseEntity<AccountResponseDTO> getAccount(
             @RequestParam String email) {
@@ -59,7 +58,6 @@ public class AccountController {
 
 
     @Operation(summary = "Обновление аккаунта")
-    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping
     public ResponseEntity<AccountMeDTO> updateAccount(
             @Valid @RequestBody AccountMeDTO accountMeDTO) {
@@ -97,7 +95,6 @@ public class AccountController {
 
 
     @Operation(summary = "Получение аккаунта по ID")
-    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<AccountDataDTO> getAccountById(@PathVariable UUID id) {
         AccountDataDTO accountDTO = accountService.getAccountById(id);
@@ -105,7 +102,6 @@ public class AccountController {
     }
 
     @Operation(summary = "Пометить аккаунт как удалённый по ID")
-    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> markAccountAsDeletedById(@PathVariable UUID id) {
         accountService.markAccountAsDeleted(id);
