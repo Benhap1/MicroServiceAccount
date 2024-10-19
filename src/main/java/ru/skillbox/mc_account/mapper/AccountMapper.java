@@ -26,7 +26,15 @@ public interface AccountMapper {
     @Mapping(target = "deletionTimestamp", source = "account.deletionTimestamp", qualifiedByName = "instantToString")
     @Mapping(target = "password", source = "account.password")
     AccountResponseDTO toResponseDTO(Account account);
+
+    @Mapping(target = "regDate", source = "account.regDate", qualifiedByName = "instantToString")
+    @Mapping(target = "birthDate", source = "account.birthDate", qualifiedByName = "instantToString")
+    @Mapping(target = "lastOnlineTime", source = "account.lastOnlineTime", qualifiedByName = "instantToString")
+    @Mapping(target = "createdOn", source = "account.createdOn", qualifiedByName = "instantToString")
+    @Mapping(target = "updatedOn", source = "account.updatedOn", qualifiedByName = "instantToString")
+    @Mapping(target = "deletionTimestamp", source = "account.deletionTimestamp", qualifiedByName = "instantToString")
     AccountMeDTO toDTO(Account account);
+
     Account toEntity(AccountMeDTO accountMeDTO);
 
     default AccountDataDTO toAccountDetailsDTO(Account account) {

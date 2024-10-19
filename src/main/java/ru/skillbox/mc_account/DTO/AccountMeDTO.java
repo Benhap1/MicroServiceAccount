@@ -4,8 +4,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.Instant;
 import java.util.UUID;
 
 
@@ -34,14 +32,14 @@ public class AccountMeDTO {
     private String city;
     private String country;
     private String statusCode;
-    private Instant regDate;
-    private Instant birthDate;
+    private String regDate;
+    private String birthDate;
     private String messagePermission;
-    private Instant lastOnlineTime;
+    private String lastOnlineTime;
     private String emojiStatus;
-    private Instant createdOn;
-    private Instant updatedOn;
-    private Instant deletionTimestamp;
+    private String createdOn;
+    private String updatedOn;
+    private String deletionTimestamp;
     private boolean deleted;
     private boolean online;
     private boolean blocked;

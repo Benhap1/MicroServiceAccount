@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/account").hasAnyAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/account/{id}").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/account/{id}").hasAuthority("ADMIN")
-                        .anyRequest().authenticated() // Все остальные запросы требуют аутентификации
+                        .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
