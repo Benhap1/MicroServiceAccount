@@ -21,7 +21,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 2305
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   zookeeper:
     image: zookeeper
@@ -31,7 +31,10 @@ services:
   kafka:
     image: wurstmeister/kafka
     ports:
-      - "9092:9092"
+      - "9092:9092"  # Порт для доступа из контейнеров
+      - "9093:9093"  # Порт для доступа с хоста
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT

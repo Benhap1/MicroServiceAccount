@@ -1,5 +1,6 @@
 package ru.skillbox.mc_account.DTO;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class AccountResponseDTO {
     @Email(message = "Email should be valid")
     @NotBlank(message = "Email must not be blank")
     private String email;
+
     private String password;
     private Role role;
 
