@@ -13,7 +13,7 @@ import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import ru.skillbox.mc_account.DTO.UserEvent;
+import ru.skillbox.common.events.account.UserEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,8 +43,9 @@ public class KafkaConfig {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "user-event-group");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.skillbox.mc_account.DTO"); // Укажите доверенные пакеты
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, UserEvent.class.getName()); // Укажите тип
+//      props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.skillbox.mc_account.DTO");
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.skillbox.common.events.account");
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, UserEvent.class.getName());
         return new DefaultKafkaConsumerFactory<>(props);
     }
 

@@ -4,13 +4,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
+import ru.skillbox.common.events.account.UserEvent;
 import ru.skillbox.mc_account.DTO.*;
 import ru.skillbox.mc_account.model.Account;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import ru.skillbox.mc_account.DTO.UserEvent;
 
 @Mapper(componentModel = "spring")
 public interface AccountMapper {

@@ -2,7 +2,7 @@ package ru.skillbox.mc_account.service;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import ru.skillbox.mc_account.DTO.UserEvent;
+import ru.skillbox.common.events.account.UserEvent;
 
 @Service
 public class KafkaConsumerService {
