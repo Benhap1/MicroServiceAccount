@@ -9,35 +9,22 @@ services:
       - postgres
       - kafka
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/accounts
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts  # Имя контейнера PostgreSQL
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 2305
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092  # Имя контейнера Kafka
       SPRING_FLYWAY_ENABLED: "true"
       SPRING_FLYWAY_LOCATIONS: classpath:db/migration
       SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+    networks:
+      - kafka-docker_default  # Подключение к Kafka
+      - microservice-network   # Подключение к микросервисной сети
+      - teamcity_default       # Подключение к TeamCity сети
 
-  postgres:
-    image: postgres
-    environment:
-      POSTGRES_DB: accounts
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 2305
-    ports:
-      - "5433:5432"
-
-  zookeeper:
-    image: zookeeper
-    ports:
-      - "2181:2181"
-
-  kafka:
-    image: wurstmeister/kafka
-    ports:
-      - "9092:9092"  # Порт для доступа из контейнеров
-      - "9093:9093"  # Порт для доступа с хоста
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9093
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+networks:
+  kafka-docker_default:
+    external: true  # Внешняя сеть Kafka
+  microservice-network:
+    external: true  # Внешняя микросервисная сеть
+  teamcity_default:
+    external: true  # Внешняя сеть TeamCity
