@@ -115,3 +115,4 @@ networks:
     external: true
   teamcity_default:
     external: true
+restart: unless-stopped
