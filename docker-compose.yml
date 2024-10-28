@@ -29,41 +29,66 @@
 #  teamcity_default:
 #    external: true  # Внешняя сеть TeamCity
 
+#services:
+#  postgres:
+#    image: postgres:14
+#    container_name: postgres-container
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: 2305
+#      POSTGRES_DB: accounts
+#    ports:
+#      - "5432:5432"
+#    networks:
+#      - microservice-network
+#
+#  kafka:
+#    image: confluentinc/cp-kafka:latest
+#    container_name: kafka-docker-kafka-1
+#    environment:
+#      KAFKA_BROKER_ID: 1
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-docker-kafka-1:9092
+#    ports:
+#      - "9092:9092"
+#    networks:
+#      - microservice-network
+#
+#  zookeeper:
+#    image: zookeeper:3.8.0
+#    environment:
+#      ZOO_MY_ID: 1
+#      ZOO_SERVERS: server.1=zookeeper:2888:3888
+#    ports:
+#      - "2181:2181"
+#    networks:
+#      - microservice-network
+#
+#  account-service:
+#    image: account-service
+#    build:
+#      context: .
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - postgres
+#      - kafka
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/accounts
+#      SPRING_DATASOURCE_USERNAME: postgres
+#      SPRING_DATASOURCE_PASSWORD: 2305
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      SPRING_FLYWAY_ENABLED: "true"
+#      SPRING_FLYWAY_LOCATIONS: classpath:db/migration
+#      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+#    networks:
+#      - microservice-network
+#
+#networks:
+#  microservice-network:
+#    external: true
+
 services:
-  postgres:
-    image: postgres:14
-    container_name: postgres-container
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 2305
-      POSTGRES_DB: accounts
-    ports:
-      - "5432:5432"
-    networks:
-      - microservice-network
-
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    container_name: kafka-docker-kafka-1
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-docker-kafka-1:9092
-    ports:
-      - "9092:9092"
-    networks:
-      - microservice-network
-
-  zookeeper:
-    image: zookeeper:3.8.0
-    environment:
-      ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1=zookeeper:2888:3888
-    ports:
-      - "2181:2181"
-    networks:
-      - microservice-network
-
   account-service:
     image: account-service
     build:
@@ -71,19 +96,24 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
-      - kafka
+      - kafka  # только зависимости
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/accounts
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts  # имя существующего контейнера PostgreSQL
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 2305
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092
       SPRING_FLYWAY_ENABLED: "true"
       SPRING_FLYWAY_LOCATIONS: classpath:db/migration
       SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
     networks:
+      - kafka-docker_default
       - microservice-network
+      - teamcity_default
 
 networks:
+  kafka-docker_default:
+    external: true
   microservice-network:
+    external: true
+  teamcity_default:
     external: true
