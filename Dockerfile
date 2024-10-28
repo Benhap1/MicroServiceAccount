@@ -1,5 +1,5 @@
 
-FROM openjdk-17-slim AS build
+FROM openjdk:17-oracle
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
