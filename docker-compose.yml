@@ -1,3 +1,34 @@
+#services:
+#  account-service:
+#    image: account-service
+#    build:
+#      context: .
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - postgres
+#      - kafka
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts  # Имя контейнера PostgreSQL
+#      SPRING_DATASOURCE_USERNAME: postgres
+#      SPRING_DATASOURCE_PASSWORD: 2305
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092  # Имя контейнера Kafka
+#      SPRING_FLYWAY_ENABLED: "true"
+#      SPRING_FLYWAY_LOCATIONS: classpath:db/migration
+#      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+#    networks:
+#      - kafka-docker_default  # Подключение к Kafka
+#      - microservice-network   # Подключение к микросервисной сети
+#      - teamcity_default       # Подключение к TeamCity сети
+#
+#networks:
+#  kafka-docker_default:
+#    external: true  # Внешняя сеть Kafka
+#  microservice-network:
+#    external: true  # Внешняя микросервисная сеть
+#  teamcity_default:
+#    external: true  # Внешняя сеть TeamCity
+
 services:
   account-service:
     image: account-service
@@ -9,22 +40,16 @@ services:
       - postgres
       - kafka
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts  # Имя контейнера PostgreSQL
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 2305
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092  # Имя контейнера Kafka
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092
       SPRING_FLYWAY_ENABLED: "true"
       SPRING_FLYWAY_LOCATIONS: classpath:db/migration
       SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
     networks:
-      - kafka-docker_default  # Подключение к Kafka
-      - microservice-network   # Подключение к микросервисной сети
-      - teamcity_default       # Подключение к TeamCity сети
+      - microservice-network
 
 networks:
-  kafka-docker_default:
-    external: true  # Внешняя сеть Kafka
   microservice-network:
-    external: true  # Внешняя микросервисная сеть
-  teamcity_default:
-    external: true  # Внешняя сеть TeamCity
+    external: true
