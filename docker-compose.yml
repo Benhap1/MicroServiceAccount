@@ -98,7 +98,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts  # Подключение к существующему PostgreSQL контейнеру
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 2305
+      SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092  # Подключение к существующему Kafka контейнеру
       SPRING_FLYWAY_ENABLED: "true"
       SPRING_FLYWAY_LOCATIONS: classpath:db/migration
