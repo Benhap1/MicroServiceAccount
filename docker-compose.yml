@@ -29,7 +29,21 @@
 #  teamcity_default:
 #    external: true  # Внешняя сеть TeamCity
 
+version: '3.8'
+
 services:
+  postgres:
+    image: postgres:14
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2305
+      POSTGRES_DB: accounts
+    ports:
+      - "5432:5432"
+    networks:
+      - microservice-network
+
   account-service:
     image: account-service
     build:
@@ -40,7 +54,7 @@ services:
       - postgres
       - kafka
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/accounts
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 2305
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092
