@@ -6,11 +6,10 @@
 #    ports:
 #      - "8080:8080"
 #    environment:
-##      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts  # Подключение к существующему PostgreSQL контейнеру
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://172.17.0.2:5432/accounts
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts  # Подключение к существующему контейнеру
 #      SPRING_DATASOURCE_USERNAME: network
 #      SPRING_DATASOURCE_PASSWORD: dreamteam777*
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092  # Подключение к существующему Kafka контейнеру
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092  # Подключение к Kafka
 #      SPRING_FLYWAY_ENABLED: "true"
 #      SPRING_FLYWAY_LOCATIONS: classpath:db/migration
 #      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
@@ -27,7 +26,6 @@
 #  teamcity_default:
 #    external: true
 
-
 services:
   account-service:
     image: account-service
@@ -43,6 +41,17 @@ services:
       SPRING_FLYWAY_ENABLED: "true"
       SPRING_FLYWAY_LOCATIONS: classpath:db/migration
       SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+    networks:
+      - kafka-docker_default
+      - microservice-network
+      - teamcity_default
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    environment:
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-docker-kafka-1:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # Подключение к Zookeeper
     networks:
       - kafka-docker_default
       - microservice-network
