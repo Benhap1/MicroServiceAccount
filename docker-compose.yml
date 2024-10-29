@@ -27,6 +27,7 @@
 #  teamcity_default:
 #    external: true
 
+
 services:
   account-service:
     image: account-service
@@ -42,8 +43,6 @@ services:
       SPRING_FLYWAY_ENABLED: "true"
       SPRING_FLYWAY_LOCATIONS: classpath:db/migration
       SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
-    depends_on:
-      - postgres-container  # Зависимость от контейнера PostgreSQL
     networks:
       - kafka-docker_default
       - microservice-network
