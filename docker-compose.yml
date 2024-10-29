@@ -1,4 +1,44 @@
+#services:
+#  account-service:
+#    image: account-service
+#    build:
+#      context: .
+#    ports:
+#      - "8080:8080"
+#    environment:
+##      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts  # Подключение к существующему PostgreSQL контейнеру
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://172.17.0.2:5432/accounts
+#      SPRING_DATASOURCE_USERNAME: network
+#      SPRING_DATASOURCE_PASSWORD: dreamteam777*
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092  # Подключение к существующему Kafka контейнеру
+#      SPRING_FLYWAY_ENABLED: "true"
+#      SPRING_FLYWAY_LOCATIONS: classpath:db/migration
+#      SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+#    networks:
+#      - kafka-docker_default
+#      - microservice-network
+#      - teamcity_default
+#
+#networks:
+#  kafka-docker_default:
+#    external: true
+#  microservice-network:
+#    external: true
+#  teamcity_default:
+#    external: true
+
 services:
+  postgres-container:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: accounts
+      POSTGRES_USER: network
+      POSTGRES_PASSWORD: dreamteam777*
+    ports:
+      - "5432:5432"
+    networks:
+      - microservice-network
+
   account-service:
     image: account-service
     build:
@@ -6,14 +46,15 @@ services:
     ports:
       - "8080:8080"
     environment:
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts  # Подключение к существующему PostgreSQL контейнеру
-      SPRING_DATASOURCE_URL: jdbc:postgresql://172.17.0.2:5432/accounts
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts
       SPRING_DATASOURCE_USERNAME: network
       SPRING_DATASOURCE_PASSWORD: dreamteam777*
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092  # Подключение к существующему Kafka контейнеру
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092
       SPRING_FLYWAY_ENABLED: "true"
       SPRING_FLYWAY_LOCATIONS: classpath:db/migration
       SPRING_FLYWAY_BASELINE_ON_MIGRATE: "true"
+    depends_on:
+      - postgres-container
     networks:
       - kafka-docker_default
       - microservice-network
