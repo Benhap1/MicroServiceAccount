@@ -6,7 +6,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts  # Подключение к существующему PostgreSQL контейнеру
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-container:5432/accounts  # Подключение к существующему PostgreSQL контейнеру
+      SPRING_DATASOURCE_URL: jdbc:postgresql://172.17.0.2:5432/accounts
       SPRING_DATASOURCE_USERNAME: network
       SPRING_DATASOURCE_PASSWORD: dreamteam777*
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-docker-kafka-1:9092  # Подключение к существующему Kafka контейнеру
