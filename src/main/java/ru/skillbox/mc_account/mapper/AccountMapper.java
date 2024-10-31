@@ -16,6 +16,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
+    // Role for UserEvent added
 
     AccountMapper INSTANCE = Mappers.getMapper(AccountMapper.class);
 
