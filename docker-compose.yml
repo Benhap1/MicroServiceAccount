@@ -82,8 +82,6 @@
 #    external: true
 
 
-version: '3.8'
-
 services:
   zookeeper:
     image: zookeeper:3.8.0
@@ -130,14 +128,15 @@ services:
       - microservice-network
       - teamcity_default
 
-  kafdrop:
-    image: obsidiandynamics/kafdrop
+  akhq:
+    image: tchiotludo/akhq
     ports:
-      - "9000:9000"
+      - "8087:8080"  # Порт, на котором будет доступен AKHQ
     environment:
-      KAFKA_SERVERS: kafka:9092   # Укажите адрес вашего Kafka сервера
-      ZOOKEEPER_CONNECT: zookeeper:2181  # Укажите адрес вашего Zookeeper сервера
-      ALLOW_CORS: "true"           # Включить CORS, если необходимо
+      AKHQ_CONNECTIONS__MY_CLUSTER__TYPE: kafka
+      AKHQ_CONNECTIONS__MY_CLUSTER__BOOTSTRAPSERVERS: kafka:9092
+      AKHQ_CONNECTIONS__MY_CLUSTER__SCHEMAREGISTRY: ""
+      ALLOW_CORS: "true"  # Включить CORS, если необходимо
     networks:
       - kafka-docker_default
       - microservice-network
