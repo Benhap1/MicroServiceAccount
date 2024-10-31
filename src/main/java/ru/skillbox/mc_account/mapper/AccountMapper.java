@@ -7,6 +7,8 @@ import org.mapstruct.factory.Mappers;
 import ru.skillbox.common.events.account.UserEvent;
 import ru.skillbox.mc_account.DTO.*;
 import ru.skillbox.mc_account.model.Account;
+import ru.skillbox.mc_account.model.Role;
+
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -73,6 +75,7 @@ public interface AccountMapper {
     @Mapping(target = "lastName", source = "account.lastName")
     @Mapping(target = "email", source = "account.email")
     @Mapping(target = "password", source = "account.password")
+    @Mapping(target = "roles", source = "account.role", qualifiedByName = "roleToString")
     @Mapping(target = "messagePermission", source = "account.messagePermission")
     @Mapping(target = "deleted", source = "account.deleted")
     @Mapping(target = "blocked", source = "account.blocked")
@@ -82,5 +85,9 @@ public interface AccountMapper {
     @Named("instantToString")
     default String instantToString(Instant instant) {
         return instant != null ? DateTimeFormatter.ISO_INSTANT.format(instant) : null;
+    }
+    @Named("roleToString")
+    default String roleToString(Role role) {
+        return role != null ? role.name() : null;
     }
 }
