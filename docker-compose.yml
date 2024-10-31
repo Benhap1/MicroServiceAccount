@@ -82,7 +82,6 @@
 #    external: true
 
 
-version: '3.8'
 
 services:
   zookeeper:
@@ -130,14 +129,17 @@ services:
       - microservice-network
       - teamcity_default
 
-  console:
-    image: redpanda/console
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:latest
     ports:
-      - "8087:8080" # Указываем порт, через который будет доступен интерфейс
+      - "9021:9021"
     environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      KAFKA_API_VERSION: "7.7.1-ccs" # Укажите версию API, соответствующую вашей Kafka
-      KAFKA_SECURITY_PROTOCOL: "PLAINTEXT"
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: kafka:9092
+      CONTROL_CENTER_ZOOKEEPER: zookeeper:2181
+      CONTROL_CENTER_LISTENERS: http://0.0.0.0:9021
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_MONITORING_INTERVAL: 10
+      CONTROL_CENTER_LOG4J_LOGGERS: "org.apache.kafka=DEBUG"
     networks:
       - kafka-docker_default
       - microservice-network
@@ -150,5 +152,6 @@ networks:
     external: true
   teamcity_default:
     external: true
+
 
 
