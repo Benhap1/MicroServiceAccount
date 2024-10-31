@@ -132,7 +132,7 @@ services:
   control-center:
     image: confluentinc/cp-enterprise-control-center:latest
     ports:
-      - "9021:9021"
+      - "0.0.0.0:9021:9021"
     environment:
       CONTROL_CENTER_BOOTSTRAP_SERVERS: kafka:9092
       CONTROL_CENTER_ZOOKEEPER: zookeeper:2181
