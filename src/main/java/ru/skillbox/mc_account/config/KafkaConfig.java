@@ -43,20 +43,28 @@ public class KafkaConfig {
     }
 
 
+//    @Bean
+//    public ConsumerFactory<String, CommonEvent<UserEvent>> consumerFactory() {
+//        Map<String, Object> props = new HashMap<>();
+//        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+//        props.put(ConsumerConfig.GROUP_ID_CONFIG, "user-event-group");
+//        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+//        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+//        props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.skillbox.common.events");
+//        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, CommonEvent.class.getName());
+//        return new DefaultKafkaConsumerFactory<>(props);
+//    }
+
     @Bean
     public ConsumerFactory<String, CommonEvent<UserEvent>> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "user-event-group");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, CommonEventDeserializer.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.skillbox.common.events");
-//        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, CommonEvent.class.getName());
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.skillbox.common.events.CommonEvent<ru.skillbox.common.events.UserEvent>");
         return new DefaultKafkaConsumerFactory<>(props);
     }
-
-
 
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, CommonEvent<UserEvent>>> kafkaListenerContainerFactory() {
