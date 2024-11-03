@@ -7,7 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
-import ru.skillbox.common.events.account.UserEvent;
+import ru.skillbox.common.events.UserEvent;
 import ru.skillbox.mc_account.DTO.AccountDataDTO;
 import ru.skillbox.mc_account.DTO.AccountMeDTO;
 import ru.skillbox.mc_account.DTO.AccountResponseDTO;

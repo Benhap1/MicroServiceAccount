@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
-import ru.skillbox.common.events.account.UserEvent;
+import ru.skillbox.common.events.UserEvent;
 import ru.skillbox.mc_account.DTO.*;
 import ru.skillbox.mc_account.model.Account;
 import ru.skillbox.mc_account.model.Role;

@@ -14,7 +14,8 @@ import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import ru.skillbox.common.events.account.UserEvent;
+import ru.skillbox.common.events.CommonEvent;
+import ru.skillbox.common.events.UserEvent;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +26,9 @@ public class KafkaConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
+
     @Bean
-    public ProducerFactory<String, UserEvent> producerFactory() {
+    public ProducerFactory<String, CommonEvent<UserEvent>> producerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers); // Используем значение из переменных окружения
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -36,27 +38,27 @@ public class KafkaConfig {
 
 
     @Bean
-    public KafkaTemplate<String, UserEvent> kafkaTemplate() {
+    public KafkaTemplate<String, CommonEvent<UserEvent>> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
 
     @Bean
-    public ConsumerFactory<String, UserEvent> consumerFactory() {
+    public ConsumerFactory<String, CommonEvent<UserEvent>> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers); // Используем значение из переменных окружения
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "user-event-group");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.skillbox.common.events.account");
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, UserEvent.class.getName());
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.skillbox.common.events");
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, CommonEvent.class.getName());
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, UserEvent>> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, UserEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, CommonEvent<UserEvent>>> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, CommonEvent<UserEvent>> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
