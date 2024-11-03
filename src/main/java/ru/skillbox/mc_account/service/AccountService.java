@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
+import ru.skillbox.common.events.CommonEvent;
 import ru.skillbox.common.events.UserEvent;
 import ru.skillbox.mc_account.DTO.AccountDataDTO;
 import ru.skillbox.mc_account.DTO.AccountMeDTO;
@@ -33,14 +34,15 @@ public class AccountService {
     private final KafkaProducerService kafkaProducerService;
 
 
-    // POST /api/v1/account
+      // POST /api/v1/account
     @Validated
     public AccountMeDTO createAccount(@Valid AccountMeDTO accountMeDTO) {
         Account account = accountMapper.toEntity(accountMeDTO);
         account.setCreatedOn(Instant.now());
         account.setPassword(passwordEncoder.encode(accountMeDTO.getPassword()));
         Account savedAccount = accountRepository.save(account);
-        kafkaProducerService.sendUserEvent(accountMapper.toUserEvent(savedAccount));
+        CommonEvent<UserEvent> userEvent = accountMapper.toCommonEvent(savedAccount);
+        kafkaProducerService.sendUserEvent(userEvent);
         return accountMapper.toDTO(savedAccount);
     }
 
@@ -95,7 +97,8 @@ public class AccountService {
         account.setBlocked(accountMeDTO.isBlocked());
 
         Account updatedAccount = accountRepository.save(account);
-        kafkaProducerService.sendUserEvent(accountMapper.toUserEvent(updatedAccount));
+        CommonEvent<UserEvent> userEvent = accountMapper.toCommonEvent(updatedAccount);
+        kafkaProducerService.sendUserEvent(userEvent);
         return accountMapper.toDTO(updatedAccount);
     }
 
@@ -122,7 +125,7 @@ public class AccountService {
     public AccountMeDTO updateAccountMe(String email) {
         Account account = accountRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
-        UserEvent userEvent = accountMapper.toUserEvent(account);
+        CommonEvent<UserEvent> userEvent = accountMapper.toCommonEvent(account);
         kafkaProducerService.sendUserEvent(userEvent);
         return accountMapper.toDTO(account);
     }
@@ -136,7 +139,8 @@ public class AccountService {
         account.setDeleted(true);
         account.setDeletionTimestamp(Instant.now());
         accountRepository.save(account);
-        kafkaProducerService.sendUserEvent(accountMapper.toUserEvent(account));
+        CommonEvent<UserEvent> userEvent = accountMapper.toCommonEvent(account);
+        kafkaProducerService.sendUserEvent(userEvent);
     }
 
 
@@ -158,6 +162,7 @@ public class AccountService {
         account.setDeleted(true);
         account.setDeletionTimestamp(Instant.now());
         accountRepository.save(account);
-        kafkaProducerService.sendUserEvent(accountMapper.toUserEvent(account));
+        CommonEvent<UserEvent> userEvent = accountMapper.toCommonEvent(account);
+        kafkaProducerService.sendUserEvent(userEvent);
     }
 }

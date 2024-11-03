@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
+import ru.skillbox.common.events.CommonEvent;
 import ru.skillbox.common.events.UserEvent;
 import ru.skillbox.mc_account.DTO.*;
 import ru.skillbox.mc_account.model.Account;
@@ -13,11 +14,10 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
-
-    // Role for UserEvent added
 
     AccountMapper INSTANCE = Mappers.getMapper(AccountMapper.class);
 
@@ -71,6 +71,11 @@ public interface AccountMapper {
         return accountDataDTO;
     }
 
+
+    default CommonEvent<UserEvent> toCommonEvent(Account account) {
+        UserEvent userEvent = toUserEvent(account);
+        return new CommonEvent<>(UUID.randomUUID(), Instant.now(), userEvent.getClass().getSimpleName(), userEvent);
+    }
 
     @Mapping(target = "id", source = "account.id")
     @Mapping(target = "firstName", source = "account.firstName")

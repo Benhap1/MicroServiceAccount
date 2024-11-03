@@ -51,9 +51,11 @@ public class KafkaConfig {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.skillbox.common.events");
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, CommonEvent.class.getName());
+//        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, CommonEvent.class.getName());
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.skillbox.common.events.CommonEvent<ru.skillbox.common.events.UserEvent>");
         return new DefaultKafkaConsumerFactory<>(props);
     }
+
 
 
     @Bean
