@@ -12,13 +12,14 @@ import ru.skillbox.common.events.UserEvent;
 @AllArgsConstructor
 public class KafkaProducerService {
 
-    private static final Logger log = LoggerFactory.getLogger(KafkaProducerService.class); // Создаем логгер
+    private static final Logger log = LoggerFactory.getLogger(KafkaProducerService.class);
 
     private final KafkaTemplate<String, CommonEvent<UserEvent>> kafkaTemplate;
     private static final String TOPIC = "user-events";
 
     public void sendUserEvent(CommonEvent<UserEvent> commonEvent) {
-        log.info("Sending user event with id: {}", commonEvent.getEventId());
-        kafkaTemplate.send(TOPIC, commonEvent.getEventId().toString(), commonEvent);
+        log.info("Sending user event with id: {}", commonEvent.getEventType());
+        kafkaTemplate.send(TOPIC, commonEvent.getEventType(), commonEvent);
     }
+
 }

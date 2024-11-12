@@ -6,7 +6,10 @@ import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 import ru.skillbox.common.events.CommonEvent;
 import ru.skillbox.common.events.UserEvent;
-import ru.skillbox.mc_account.DTO.*;
+import ru.skillbox.mc_account.DTO.AccountDataDTO;
+import ru.skillbox.mc_account.DTO.AccountMeDTO;
+import ru.skillbox.mc_account.DTO.AccountResponseDTO;
+import ru.skillbox.mc_account.DTO.AuthorityDTO;
 import ru.skillbox.mc_account.model.Account;
 import ru.skillbox.mc_account.model.Role;
 
@@ -14,7 +17,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
@@ -74,7 +76,7 @@ public interface AccountMapper {
 
     default CommonEvent<UserEvent> toCommonEvent(Account account) {
         UserEvent userEvent = toUserEvent(account);
-        return new CommonEvent<>(UUID.randomUUID(), Instant.now(), userEvent.getClass().getSimpleName(), userEvent);
+        return new CommonEvent<>(userEvent.getClass().getSimpleName(), userEvent);
     }
 
     @Mapping(target = "id", source = "account.id")

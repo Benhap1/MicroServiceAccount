@@ -1,29 +1,32 @@
 package ru.skillbox.mc_account.config;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.kafka.common.serialization.Deserializer;
 import ru.skillbox.common.events.CommonEvent;
+import ru.skillbox.common.events.UserEvent;
 
 import java.io.IOException;
 import java.util.Map;
 
 public class CommonEventDeserializer implements Deserializer<CommonEvent<?>> {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
+
+    public CommonEventDeserializer() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // Регистрируем модуль для работы с Instant
+    }
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
-        // Конфигурация, если она нужна
     }
 
     @Override
     public CommonEvent<?> deserialize(String topic, byte[] data) {
         try {
-            // Десериализация из JSON
-            return objectMapper.readValue(data, CommonEvent.class);
+            return objectMapper.readValue(data, new TypeReference<CommonEvent<UserEvent>>() {});
         } catch (IOException e) {
             throw new RuntimeException("Failed to deserialize CommonEvent", e);
         }
@@ -31,6 +34,6 @@ public class CommonEventDeserializer implements Deserializer<CommonEvent<?>> {
 
     @Override
     public void close() {
-        // Закрытие, если нужно
     }
 }
+
